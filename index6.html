@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crops Manager</title>
+  <style>
+    :root {
+      --primary: #04491b; /* green-600 */
+      --primary-50: #f0fdf4; /* green-50 */
+      --primary-100: #dcfce7; /* green-100 */
+      --primary-200: #bbf7d0; /* green-200 */
+      --muted: #065f46; /* darker green for secondary text */
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --green-50: #f0fdf4;
+      --green-600: #16a34a;
+      --yellow-50: #fffbeb;
+      --yellow-600: #d97706;
+      --red-50: #fef2f2;
+      --red-600: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+    }
+
+    /* Topbar */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #059669;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.topbar .logo {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.topbar .nav-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.topbar .nav-buttons button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.topbar .nav-buttons button:hover {
+  background: rgba(197, 26, 26, 0.15);
+}
+
+/* push content below topbar */
+body {
+  padding-top: 70px; /* Prevent overlap */
+}
+
+
+    .container { padding: 16px; max-width: 1200px; margin: 0 auto; }
+
+    .header { display: flex; flex-direction: column; gap: 12px; }
+    .header-row { display: flex; flex-direction: column; gap: 12px; }
+
+    .title { margin: 0; font-size: 20px; color: var(--primary); }
+    .subtitle { margin: 0; color: var(--primary); font-size: 14px; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .btn { padding: 10px 14px; border: 1px solid var(--primary-200); background: var(--card); color: var(--primary); cursor: pointer; border-radius: 8px; font-weight: 600; }
+    .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn.outline { background: transparent; color: var(--primary); border-color: var(--primary-200); }
+
+    .select, .input { height: 38px; padding: 0 10px; border: 1px solid var(--primary-200); border-radius: 8px; background: #fff; color: var(--primary); }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px; }
+    @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } .title { font-size: 24px; } .subtitle { font-size: 16px; } .header-row { flex-direction: row; align-items: center; justify-content: space-between; } }
+    @media (min-width: 1024px) { .grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
+
+    .card { background: var(--card); border: 1px solid var(--primary-100); border-radius: 12px; overflow: hidden; transition: box-shadow .2s ease; }
+    .card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+
+    .card-header { padding: 16px; border-bottom: 1px solid var(--primary-100); }
+    .card-title { margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px; color: var(--primary); }
+    .card-sub { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .badge { display: inline-block; padding: 2px 8px; font-size: 12px; border-radius: 999px; border: 1px solid var(--primary-100); color: var(--primary); background: #fff; }
+    .badge.soft { border: none; }
+
+    .stage-germination { background: #dcfce7; color: #166534; }
+    .stage-growing { background: #bbf7d0; color: #166534; }
+    .stage-flowering { background: #d1fae5; color: #065f46; }
+    .stage-ready { background: #a7f3d0; color: #065f46; }
+
+    .health-excellent { background: var(--green-50); color: var(--green-600); }
+    .health-good { background: var(--green-50); color: var(--green-600); }
+    .health-fair { background: var(--yellow-50); color: var(--yellow-600); }
+    .health-poor { background: var(--red-50); color: var(--red-600); }
+
+    .card-content { padding: 16px; display: grid; gap: 14px; }
+
+    .row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+    .row span:first-child { color: var(--primary); display: inline-flex; align-items: center; gap: 6px; }
+
+    .progress { height: 10px; background: var(--primary-100); border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; background: var(--primary); width: 0; transition: width .4s ease; }
+
+    .two-col { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 768px) { .two-col { grid-template-columns: 1fr 1fr; } }
+
+    .note { padding: 12px; background: var(--primary-50); border: 1px solid var(--primary-100); border-radius: 10px; font-size: 14px; color: var(--primary); }
+
+    .card-actions { display: flex; gap: 8px; }
+
+    /* Icons */
+    .icon { display: inline-flex; width: 16px; height: 16px; color: var(--primary); }
+    .icon svg { width: 16px; height: 16px; display: block; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); padding: 16px; }
+    .modal.open { display: flex; }
+    .modal-content { background: #fff; border-radius: 12px; width: 100%; max-width: 600px; padding: 16px; }
+    .modal-title { margin: 0 0 12px; font-size: 18px; color: var(--primary); }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    .field { display: grid; gap: 6px; }
+    .label { font-size: 12px; color: var(--primary); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div>
+          <h1 class="title" id="title">Crops</h1>
+          <p class="subtitle" id="subtitle">Monitor and manage all your crops in one place</p>
+        </div>
+        <div class="actions">
+          <select id="language" class="select"></select>
+          <button id="addBtn" class="btn primary">+ Add New Crop</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="grid" class="grid"></div>
+  </div>
+
+<!-- Taskbar Code -->
+  <div class="topbar">
+  <div class="logo">Agro Suvidha</div>
+  <div class="nav-buttons">
+      <button onclick="window.location.href='index4.html'">Home</button>
+      <button onclick="window.location.href='index6.html'">Crops</button>
+      <button onclick="window.location.href='index7.html'">Weather</button>
+      <button onclick="window.location.href='about_us.html'">About Us</button>
+  </div>
+</div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h2 class="modal-title" id="modalTitle">Add New Crop</h2>
+      <div class="grid-2">
+        <div class="field">
+          <label class="label" for="cropName">Crop Name</label>
+          <input id="cropName" class="input" placeholder="Select crop name" />
+        </div>
+        <div class="field">
+          <label class="label" for="variety">Variety</label>
+          <input id="variety" class="input" placeholder="Variety" />
+        </div>
+        <div class="field">
+          <label class="label" for="fieldSel">Field</label>
+          <select id="fieldSel" class="select"></select>
+        </div>
+        <div class="field">
+          <label class="label" for="area">Area (acres)</label>
+          <input id="area" type="number" class="input" placeholder="2.5" />
+        </div>
+        <div class="field">
+          <label class="label" for="planted">Planting Date</label>
+          <input id="planted" type="date" class="input" />
+        </div>
+        <div class="field">
+          <label class="label" for="harvest">Expected Harvest</label>
+          <input id="harvest" type="date" class="input" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="cancel" class="btn">Cancel</button>
+        <button id="save" class="btn primary">Add Crop</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Translations
+    const translations = {
+      English: {
+        crops: { title: 'Crops', addNewCrop: 'Add New Crop', cropName: 'Crop Name', variety: 'Variety', field: 'Field', area: 'Area', plantingDate: 'Planting Date', expectedHarvest: 'Expected Harvest', growthStage: 'Growth Stage', addCrop: 'Add Crop', viewDetails: 'View Details', wateringSchedule: 'Watering Schedule' },
+        common: { select: 'Select', cancel: 'Cancel', update: 'Update' },
+        cropNames: { tomatoes: 'Tomatoes', corn: 'Corn', wheat: 'Wheat', soybeans: 'Soybeans' },
+        fieldNames: { northField: 'North Field', southField: 'South Field', eastField: 'East Field', westField: 'West Field' },
+        growthStages: { germination: 'Germination', growing: 'Growing', flowering: 'Flowering', ready: 'Ready' },
+        healthStatus: { excellent: 'Excellent', good: 'Good', fair: 'Fair', poor: 'Poor' },
+        timeLabels: { daysAgo: 'days ago' },
+        subtitle: 'Monitor and manage all your crops in one place'
+      },
+      Hindi: {
+        crops: { title: 'फसलें', addNewCrop: 'नई फसल जोड़ें', cropName: 'फसल का नाम', variety: 'किस्म', field: 'खेत', area: 'क्षेत्र', plantingDate: 'रोपण तिथि', expectedHarvest: 'कटाई की तिथि', growthStage: 'विकास चरण', addCrop: 'फसल जोड़ें', viewDetails: 'विवरण देखें', wateringSchedule: 'सिंचाई अनुसूची' },
+        common: { select: 'चुनें', cancel: 'रद्द करें', update: 'अपडेट' },
+        cropNames: { tomatoes: 'टमाटर', corn: 'मक्का', wheat: 'गेहूं', soybeans: 'सोयाबीन' },
+        fieldNames: { northField: 'उत्तरी खेत', southField: 'दक्षिणी खेत', eastField: 'पूर्वी खेत', westField: 'पश्चिमी खेत' },
+        growthStages: { germination: 'अंकुरण', growing: 'वृद्धि', flowering: 'फूल आना', ready: 'तैयार' },
+        healthStatus: { excellent: 'उत्तम', good: 'अच्छा', fair: 'ठीक', poor: 'खराब' },
+        timeLabels: { daysAgo: 'दिन पहले' },
+        subtitle: 'अपनी सभी फसलों को एक ही जगह पर मॉनिटर और प्रबंधित करें'
+      },
+      Bengali: {
+        crops: { title: 'ফসল', addNewCrop: 'নতুন ফসল যোগ করুন', cropName: 'ফসলের নাম', variety: 'জাত', field: 'ক্ষেত', area: 'এলাকা', plantingDate: 'রোপণের তারিখ', expectedHarvest: 'ফসল কাটার তারিখ', growthStage: 'বৃদ্ধি পর্যায়', addCrop: 'ফসল যোগ করুন', viewDetails: 'বিস্তারিত দেখুন', wateringSchedule: 'সেচের সময়সূচি' },
+        common: { select: 'নির্বাচন', cancel: 'বাতিল', update: 'আপডেট' },
+        cropNames: { tomatoes: 'টমেটো', corn: 'ভুট্টা', wheat: 'গম', soybeans: 'সয়াবিন' },
+        fieldNames: { northField: 'উত্তর ক্ষেত্র', southField: 'দক্ষিণ ক্ষেত্র', eastField: 'পূর্ব ক্ষেত্র', westField: 'পশ্চিম ক্ষেত্র' },
+        growthStages: { germination: 'অঙ্কুরোদগম', growing: 'বৃদ্ধি', flowering: 'ফুল ফোটা', ready: 'প্রস্তুত' },
+        healthStatus: { excellent: 'অসাধারণ', good: 'ভাল', fair: 'মোটামুটি', poor: 'খারাব' },
+        timeLabels: { daysAgo: 'দিন আগে' },
+        subtitle: 'এক জায়গায় আপনার সব ফসল পর্যবেক্ষণ ও পরিচালনা করুন'
+      },
+      Punjabi: {
+        crops: { title: 'ਫਸਲਾਂ', addNewCrop: 'ਨਵੀਂ ਫਸਲ ਜੋੜੋ', cropName: 'ਫਸਲ ਦਾ ਨਾਮ', variety: 'ਕਿਸਮ', field: 'ਖੇਤ', area: 'ਖੇਤਰ', plantingDate: 'ਬੀਜਣ ਦੀ ਤਾਰੀਖ', expectedHarvest: 'ਕਟਾਈ ਦੀ ਤਾਰੀਖ', growthStage: 'ਵਿਕਾਸ ਅਵਸਥਾ', addCrop: 'ਫਸਲ ਜੋੜੋ', viewDetails: 'ਵੇਰਵੇ ਦੇਖੋ', wateringSchedule: 'ਸਿੰਜਾਈ ਸ਼ਡਿਊਲ' },
+        common: { select: 'ਚੁਣੋ', cancel: 'ਰੱਦ ਕਰੋ', update: 'ਅਪਡੇਟ' },
+        cropNames: { tomatoes: 'ਟਮਾਟਰ', corn: 'ਮੱਕੀ', wheat: 'ਗandum', soybeans: 'ਸੋਯਾਬੀਨ' },
+        fieldNames: { northField: 'ਉੱਤਰੀ ਖੇਤ', southField: 'ਦੱਖਣੀ ਖੇਤ', eastField: 'ਪੂਰਬੀ ਖੇਤ', westField: 'ਪੱਛਮੀ ਖੇਤ' },
+        growthStages: { germination: 'ਅੰਕੁਰਣ', growing: 'ਵਿਕਾਸ', flowering: 'ਫੁੱਲਣਾ', ready: 'ਤਿਆਰ' },
+        healthStatus: { excellent: 'ਸ਼ਾਂਦਾਰ', good: 'ਚੰਗਾ', fair: 'ਠੀਕ', poor: 'ਖਰਾਬ' },
+        timeLabels: { daysAgo: 'ਦਿਨ ਪਹਿਲਾਂ' },
+        subtitle: 'ਇੱਕ ਹੀ ਥਾਂ ਤੇ ਆਪਣੀਆਂ ਸਾਰੀਆਂ ਫਸਲਾਂ ਪ੍ਰਬੰਧਿਤ ਕਰੋ'
+      }
+    };
+
+    // Inline SVG icons
+    function icon(name) {
+      const map = {
+        sprout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20s5-3 5-9V7a5 5 0 0 0-5-5c0 2.5 1.5 5 5 5"/><path d="M12 13c0-6 5-9 5-9a5 5 0 0 1 5 5c-2.5 0-5-1.5-5-5"/><path d="M12 20v-7"/></svg>',
+        calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        ruler: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2l6 6L8 22l-6-6L16 2z"/><path d="M7 13l3 3"/><path d="M10 10l3 3"/><path d="M13 7l3 3"/></svg>',
+        sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M5 5l1.5 1.5M17.5 17.5L19 19M2 12h2M20 12h2M5 19l1.5-1.5M17.5 6.5L19 5"/></svg>',
+        droplet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"/></svg>'
+      };
+      return `<span class="icon">${map[name] || ''}</span>`;
+    }
+
+    const stageClass = (stage, t) => {
+      const s = stage.toLowerCase();
+      if (s === t.growthStages.germination.toLowerCase()) return 'stage-germination';
+      if (s === t.growthStages.growing.toLowerCase()) return 'stage-growing';
+      if (s === t.growthStages.flowering.toLowerCase()) return 'stage-flowering';
+      if (s === t.growthStages.ready.toLowerCase()) return 'stage-ready';
+      return '';
+    };
+
+    const healthClass = (health, t) => {
+      const h = health.toLowerCase();
+      if (h === t.healthStatus.excellent.toLowerCase()) return 'health-excellent';
+      if (h === t.healthStatus.good.toLowerCase()) return 'health-good';
+      if (h === t.healthStatus.fair.toLowerCase()) return 'health-fair';
+      if (h === t.healthStatus.poor.toLowerCase()) return 'health-poor';
+      return '';
+    };
+
+    let currentLang = 'English';
+
+    const crops = () => {
+      const t = translations[currentLang];
+      return [
+        { id: 1, name: t.cropNames.tomatoes, variety: 'Cherokee Purple', field: t.fieldNames.northField, plantedDate: '2024-03-15', expectedHarvest: '2024-06-15', stage: t.growthStages.flowering, health: t.healthStatus.excellent, progress: 65, area: '2.5 acres', estimatedYield: '15,000 lbs', wateringSchedule: 'Daily', lastWatered: 'Today', notes: 'Plants are responding well to recent fertilization' },
+        { id: 2, name: t.cropNames.corn, variety: 'Sweet Corn', field: t.fieldNames.westField, plantedDate: '2024-04-01', expectedHarvest: '2024-07-15', stage: t.growthStages.growing, health: t.healthStatus.good, progress: 45, area: '5.0 acres', estimatedYield: '25,000 ears', wateringSchedule: 'Every 2 days', lastWatered: 'Yesterday', notes: 'Some pest activity detected, monitoring closely' },
+        { id: 3, name: t.cropNames.wheat, variety: 'Hard Red Winter', field: t.fieldNames.southField, plantedDate: '2023-10-15', expectedHarvest: '2024-07-01', stage: t.growthStages.ready, health: t.healthStatus.good, progress: 95, area: '10.0 acres', estimatedYield: '400 bushels', wateringSchedule: 'Rain dependent', lastWatered: `3 ${t.timeLabels.daysAgo}`, notes: 'Weather conditions ideal for harvest' },
+        { id: 4, name: t.cropNames.soybeans, variety: 'Roundup Ready', field: t.fieldNames.eastField, plantedDate: '2024-05-01', expectedHarvest: '2024-09-15', stage: t.growthStages.germination, health: t.healthStatus.fair, progress: 15, area: '7.5 acres', estimatedYield: '300 bushels', wateringSchedule: 'Weekly', lastWatered: `2 ${t.timeLabels.daysAgo}`, notes: 'Lower germination rate than expected, investigating soil conditions' }
+      ];
+    };
+
+    const els = { grid: document.getElementById('grid'), lang: document.getElementById('language'), addBtn: document.getElementById('addBtn'), title: document.getElementById('title'), subtitle: document.getElementById('subtitle'), modal: document.getElementById('modal'), modalTitle: document.getElementById('modalTitle'), cropName: document.getElementById('cropName'), variety: document.getElementById('variety'), fieldSel: document.getElementById('fieldSel'), area: document.getElementById('area'), planted: document.getElementById('planted'), harvest: document.getElementById('harvest'), cancel: document.getElementById('cancel'), save: document.getElementById('save') };
+
+    function populateLanguageSelect() {
+      els.lang.innerHTML = '';
+      Object.keys(translations).forEach(l => { const opt = document.createElement('option'); opt.value = l; opt.textContent = l; els.lang.appendChild(opt); });
+      els.lang.value = currentLang;
+    }
+
+    function setTexts() {
+      const t = translations[currentLang];
+      els.title.textContent = t.crops.title;
+      els.subtitle.textContent = t.subtitle;
+      els.addBtn.textContent = `+ ${t.crops.addNewCrop}`;
+      els.modalTitle.textContent = t.crops.addNewCrop;
+      document.querySelector("label[for='cropName']").textContent = t.crops.cropName;
+      document.querySelector("label[for='variety']").textContent = t.crops.variety;
+      document.querySelector("label[for='fieldSel']").textContent = t.crops.field;
+      document.querySelector("label[for='area']").textContent = `${t.crops.area} (acres)`;
+      document.querySelector("label[for='planted']").textContent = t.crops.plantingDate;
+      document.querySelector("label[for='harvest']").textContent = t.crops.expectedHarvest;
+      els.cropName.placeholder = `${t.common.select} ${t.crops.cropName.toLowerCase()}`;
+      els.variety.placeholder = t.crops.variety;
+      els.cancel.textContent = t.common.cancel;
+      els.save.textContent = t.crops.addCrop;
+      els.fieldSel.innerHTML = '';
+      ;[t.fieldNames.northField, t.fieldNames.southField, t.fieldNames.eastField, t.fieldNames.westField].forEach(v => { const opt = document.createElement('option'); opt.textContent = v; els.fieldSel.appendChild(opt); });
+    }
+
+    function render() {
+      const t = translations[currentLang];
+      const list = crops();
+      els.grid.innerHTML = '';
+
+      list.forEach(crop => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        header.innerHTML = `
+          <h3 class="card-title">${icon('sprout')} ${crop.name}</h3>
+          <div class="card-sub">
+            <span class="badge">${crop.field}</span>
+            <span class="badge">${crop.variety}</span>
+            <span class="badge soft ${healthClass(crop.health, t)}">${crop.health}</span>
+            <span class="badge soft ${stageClass(crop.stage, t)}">${crop.stage}</span>
+          </div>
+        `;
+
+        const content = document.createElement('div');
+        content.className = 'card-content';
+
+        const progWrap = document.createElement('div');
+        progWrap.innerHTML = `
+          <div class="row">
+            <span>${t.crops.growthStage}</span>
+            <span style="color: var(--primary); font-weight: 700;">${crop.progress}%</span>
+          </div>
+          <div class="progress"><div class="progress-bar" style="width:${crop.progress}%"></div></div>
+        `;
+
+        const grid2 = document.createElement('div');
+        grid2.className = 'two-col';
+        grid2.innerHTML = `
+          <div style="display:grid; gap:10px;">
+            <div class="row"><span>${icon('calendar')} ${t.crops.plantingDate}</span><span style="color: var(--primary);">${new Date(crop.plantedDate).toLocaleDateString()}</span></div>
+            <div class="row"><span>${icon('ruler')} ${t.crops.area}</span><span style="color: var(--primary);">${crop.area}</span></div>
+            <div class="row"><span>${icon('sun')} Est. Yield</span><span style="color: var(--primary);">${crop.estimatedYield}</span></div>
+          </div>
+          <div style="display:grid; gap:10px;">
+            <div class="row"><span>${icon('calendar')} ${t.crops.expectedHarvest}</span><span style="color: var(--primary);">${new Date(crop.expectedHarvest).toLocaleDateString()}</span></div>
+            <div class="row"><span>${icon('droplet')} ${t.crops.wateringSchedule}</span><span style="color: var(--primary);">${crop.wateringSchedule}</span></div>
+            <div class="row"><span>${icon('droplet')} Last watered</span><span style="color: var(--primary);">${crop.lastWatered}</span></div>
+          </div>
+        `;
+
+        content.appendChild(progWrap);
+        content.appendChild(grid2);
+
+        if (crop.notes) {
+          const note = document.createElement('div');
+          note.className = 'note';
+          note.textContent = crop.notes;
+          content.appendChild(note);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+        actions.innerHTML = `
+          <button class="btn outline">${translations[currentLang].common.update}</button>
+          <button class="btn outline">${translations[currentLang].crops.viewDetails}</button>
+        `;
+
+        const section = document.createElement('div');
+        section.appendChild(header);
+        section.appendChild(content);
+        section.appendChild(actions);
+        card.appendChild(section);
+        els.grid.appendChild(card);
+      });
+    }
+
+    function openModal() { els.modal.classList.add('open'); els.modal.setAttribute('aria-hidden', 'false'); }
+    function closeModal() { els.modal.classList.remove('open'); els.modal.setAttribute('aria-hidden', 'true'); }
+
+    function saveCrop() {
+      const name = els.cropName.value.trim();
+      if (!name) { closeModal(); return; }
+      render();
+      closeModal();
+      els.cropName.value = els.variety.value = els.area.value = els.planted.value = els.harvest.value = '';
+    }
+
+    // Init
+    (function init(){
+      // improve mobile tap feedback
+      document.body.style.webkitTapHighlightColor = 'transparent';
+      populateLanguageSelect();
+      setTexts();
+      render();
+    })();
+
+    // Events
+    els.lang.addEventListener('change', () => { currentLang = els.lang.value; setTexts(); render(); });
+    els.addBtn.addEventListener('click', openModal);
+    els.cancel.addEventListener('click', closeModal);
+    els.save.addEventListener('click', saveCrop);
+    els.modal.addEventListener('click', (e) => { if (e.target === els.modal) closeModal(); });
+  </script>
+</body>
+</html>

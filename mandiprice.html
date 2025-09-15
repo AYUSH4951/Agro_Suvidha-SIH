@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mandi Prices - Smart Crop Advisory</title>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #f0fdf4, #ecfdf5, #f0fdfa);
+    }
+    .header {
+      background: linear-gradient(to right, #22c55e, #10b981, #0d9488);
+      color: white;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .header p {
+      margin: 5px 0 0;
+      opacity: 0.9;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #16a34a, #059669);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to right, #15803d, #047857);
+    }
+    .btn-blue {
+      background: #2563eb;
+      color: white;
+    }
+    .btn-blue:hover {
+      background: #1d4ed8;
+    }
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    
+    }
+    .card h2 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+    }
+    .grid {
+      display: grid;
+      gap: 15px;
+     
+    }
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .results-title {
+      text-align: center;
+      margin: 30px 0 10px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #1f2937;
+    }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+   
+    .badge.green { background: #dcfce7; color: #15803d; }
+    .badge.red { background: #fee2e2; color: #b91c1c; }
+    .profit { color: #16a34a; font-weight: bold; }
+    .loss { color: #dc2626; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="index4.html" 
+   class="btn" 
+   style="background:rgba(255,255,255,0.1); color:white; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:8px; text-decoration:none;">
+  <i data-lucide="arrow-left"></i>
+</a>
+
+      
+      <div style="background:rgba(255,255,255,0.2); padding:8px; border-radius:12px;">
+        <i data-lucide="indian rupee" style="width:28px; height:28px;"></i>
+      </div>
+      <div>
+        <h1>Smart Crop Advisory - Live Data</h1>
+        <p>Real-time mandi prices and profit analysis</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px;">
+
+    <!-- Input Form -->
+    <div class="card">
+      <h2><i data-lucide="wheat"></i> Market Price Calculator</h2>
+      <div class="grid grid-3">
+        
+        <div>
+          <label for="crop">Crop</label>
+          <select id="crop">
+            <option value="wheat">Wheat</option>
+            <option value="rice">Rice</option>
+            <option value="corn">Corn</option>
+            <option value="cotton">Cotton</option>
+            <option value="sugarcane">Sugarcane</option>
+          </select>
+
+        </div>
+        
+        <div>
+          <label for="quantity">Quantity (quintals)</label>
+          <input id="quantity" type="number" value="10" min="1">
+        </div>
+        
+        
+        <div>
+          <label for="transport">Transport cost per km (₹)</label>
+          <input id="transport" type="number" value="5" min="1">
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button class="btn btn-blue" onclick="detectLocation()">
+          <i data-lucide="map-pin"></i> Select My Location
+        </button>
+        <div id="location-info" style="margin-top:15px; display:none; background:#eff6ff; padding:10px; border-radius:8px; border:1px solid #bfdbfe;">
+          <p><i data-lucide="navigation"></i> <strong>Location detected:</strong></p>
+          <p id="coords">Latitude 26.7698, Longitude 88.3772</p>
+          <p id="place">Siliguri, West Bengal</p>
+        </div>
+        <div style="margin-top:15px;">
+          <button class="btn btn-primary" onclick="getPrices()" disabled id="priceBtn">
+            <i data-lucide="bar-chart-3"></i> Get Mandi Prices
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" style="display:none;">
+      <h2 class="results-title">Results for state: West Bengal</h2>
+      <p style="text-align:center; color:#4b5563;">Showing prices for <span id="resQuantity">10</span> quintals of <span id="resCrop">wheat</span></p>
+
+      <!-- Example nearest mandi -->
+      <div class="card" style="background:linear-gradient(to right,#eff6ff,#dbeafe);">
+        <h2><i data-lucide="target"></i> Nearest Mandi</h2>
+        <div>
+          <h3>Malda <span class="badge green">Profitable</span></h3>
+          <p>Price per quintal: <span class="profit">₹2600</span></p>
+          <p>Distance: 198.1 km</p>
+          <p>Net Profit: <span class="profit">₹25009</span></p>
+          <p>Profitability: <span class="profit">96.19%</span></p>
+        </div>
+      </div>
+
+      <!-- Example highest profit mandi -->
+      <div class="card" style="background:linear-gradient(to right,#ecfdf5,#d1fae5);">
+        <h2><i data-lucide="trending-up"></i> Highest Profit Mandi</h2>
+        <div>
+          <h3>Malda <span class="badge green">Profitable</span></h3>
+          <p>Price per quintal: <span class="profit">₹2600</span></p>
+          <p>Distance: 198.1 km</p>
+          <p>Net Profit: <span class="profit">₹25009</span></p>
+          <p>Profitability: <span class="profit">96.19%</span></p>
+        </div>
+      </div>
+
+      <!-- All Mandis -->
+      <div class="card">
+        <h2><i data-lucide="calculator"></i> All Mandis (Top 10)</h2>
+        <div>
+          <div style="padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+            <h3>1. Malda <span class="badge green">Profitable</span></h3>
+            <p>Price per quintal: ₹2600</p>
+            <p>Distance: 198.1 km</p>
+            <p>Net Profit: <span class="profit">₹25009</span></p>
+            <p>Profitability: <span class="profit">96.19%</span></p>
+          </div>
+          <!-- Repeat same block for other mandis -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+  lucide.createIcons();
+
+  let userLatitude = null;
+  let userLongitude = null;
+
+  function detectLocation() {
+    const locationInfo = document.getElementById("location-info");
+    const priceBtn = document.getElementById("priceBtn");
+    locationInfo.style.display = "block";
+
+    if (!navigator.geolocation) {
+      locationInfo.innerText = "Geolocation not supported by your browser.";
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userLatitude = pos.coords.latitude;
+        userLongitude = pos.coords.longitude;
+        document.getElementById("coords").innerText = `Latitude ${userLatitude.toFixed(4)}, Longitude ${userLongitude.toFixed(4)}`;
+        priceBtn.disabled = false;
+      },
+      (err) => {
+        locationInfo.innerText = "";
+        alert("Location detection failed. Please allow location access.");
+      }
+    );
+  }
+
+  async function getPrices() {
+    const crop = document.getElementById("crop").value.trim();
+    const quantity = parseFloat(document.getElementById("quantity").value);
+    const transportCost = parseFloat(document.getElementById("transport").value);
+    const resultsDiv = document.getElementById("results");
+
+    if (!userLatitude || !userLongitude) {
+      alert("Please detect your location first.");
+      return;
+    }
+    if (!crop) {
+      alert("Enter a crop name.");
+      return;
+    }
+    if (isNaN(quantity) || quantity <= 0) {
+      alert("Quantity must be a positive number.");
+      return;
+    }
+    if (isNaN(transportCost) || transportCost < 0) {
+      alert("Transport cost cannot be negative.");
+      return;
+    }
+
+    resultsDiv.innerHTML = "Fetching mandi prices... Please wait.";
+    resultsDiv.style.display = "block";
+
+    const payload = {
+      crop: crop,
+      quantity_quintal: quantity,
+      transport_cost_per_km: transportCost,
+      latitude: userLatitude,
+      longitude: userLongitude,
+      state: "" // optional: backend can reverse geocode
+    };
+
+    try {
+      const res = await fetch("https://mandi-price-backend.onrender.com/price-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        let errMsg = `Server returned ${res.status}`;
+        try {
+          const errData = await res.json();
+          if (errData.detail) errMsg = errData.detail;
+        } catch {}
+        throw new Error(errMsg);
+      }
+
+      const data = await res.json();
+
+      resultsDiv.innerHTML = `
+        <h2 class="results-title">Results for state: ${data.user_state}</h2>
+        <p style="text-align:center; color:#4b5563;">Showing prices for <span id="resQuantity">${quantity}</span> quintals of <span id="resCrop">${crop}</span></p>
+
+        <!-- Nearest Mandi -->
+        <div class="card" style="background:linear-gradient(to right,#eff6ff,#dbeafe);">
+          <h2><i data-lucide="target"></i> Nearest Mandi</h2>
+          <div>
+            <h3>${data.nearest_mandi.mandi_name} <span class="badge green">Profitable</span></h3>
+            <p>Price per quintal: <span class="profit">₹${data.nearest_mandi.price_per_quintal.toFixed(2)}</span></p>
+            <p>Distance: ${data.nearest_mandi.distance_km.toFixed(2)} km</p>
+            <p>Net Profit: <span class="profit">₹${data.nearest_mandi.net_profit.toFixed(2)}</span></p>
+            <p>Profitability: <span class="profit">${data.nearest_mandi.profitability_percent.toFixed(2)}%</span></p>
+          </div>
+        </div>
+
+        <!-- Highest Profit Mandi -->
+        <div class="card" style="background:linear-gradient(to right,#ecfdf5,#d1fae5);">
+          <h2><i data-lucide="trending-up"></i> Highest Profit Mandi</h2>
+          <div>
+            <h3>${data.highest_profit_mandi.mandi_name} <span class="badge green">Profitable</span></h3>
+            <p>Price per quintal: <span class="profit">₹${data.highest_profit_mandi.price_per_quintal.toFixed(2)}</span></p>
+            <p>Distance: ${data.highest_profit_mandi.distance_km.toFixed(2)} km</p>
+            <p>Net Profit: <span class="profit">₹${data.highest_profit_mandi.net_profit.toFixed(2)}</span></p>
+            <p>Profitability: <span class="profit">${data.highest_profit_mandi.profitability_percent.toFixed(2)}%</span></p>
+          </div>
+        </div>
+
+        <!-- All Mandis -->
+        <div class="card">
+          <h2><i data-lucide="calculator"></i> All Mandis (Top 10)</h2>
+          <div>
+            ${data.all_mandis.map((mandi, idx) => `
+              <div style="padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:10px;">
+                <h3>${idx + 1}. ${mandi.mandi_name} <span class="badge green">Profitable</span></h3>
+                <p>Price per quintal: ₹${mandi.price_per_quintal.toFixed(2)}</p>
+                <p>Distance: ${mandi.distance_km.toFixed(2)} km</p>
+                <p>Net Profit: <span class="profit">₹${mandi.net_profit.toFixed(2)}</span></p>
+                <p>Profitability: <span class="profit">${mandi.profitability_percent.toFixed(2)}%</span></p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons(); // re-render icons for dynamically added elements
+    } catch (e) {
+      resultsDiv.innerHTML = "";
+      alert("Error fetching prices: " + e.message);
+    }
+  }
+</script>
+
+
+</body>
+</html>
