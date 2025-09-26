@@ -742,6 +742,9 @@
     </style>
   </head>
   <body>
+    <!-- Overlay for sidebar -->
+    <div id="overlay"></div>
+
     <div class="dashboard">
       <div class="topbar">
         <div class="logo">Agro Suvidha</div>
@@ -1152,24 +1155,51 @@
         const sheet = document.getElementById("settingsSheet");
         const settingsBtn = document.getElementById("settingsBtn");
         const overlay = document.getElementById("overlay");
-
-        let startX = 0;
-        let currentX = 0;
+        
+        // Track sidebar state
+        let sidebarOpen = false;
 
         const openSidebar = () => {
           sheet.classList.add("open");
           overlay.classList.add("active");
           document.body.classList.add("sidebar-open");
+          sidebarOpen = true;
         };
 
         const closeSidebar = () => {
           sheet.classList.remove("open");
           overlay.classList.remove("active");
           document.body.classList.remove("sidebar-open");
+          sidebarOpen = false;
         };
 
-        settingsBtn.addEventListener("click", openSidebar);
+        // Toggle sidebar when settings button is clicked
+        settingsBtn.addEventListener("click", () => {
+          if (sidebarOpen) {
+            closeSidebar();
+          } else {
+            openSidebar();
+          }
+        });
+
+        // Close sidebar when overlay is clicked
         overlay.addEventListener("click", closeSidebar);
+
+        // Handle browser back button
+        window.addEventListener('popstate', (event) => {
+          if (sidebarOpen) {
+            closeSidebar();
+            // Push a new state to prevent going back in history
+            history.pushState(null, null, window.location.href);
+          }
+        });
+
+        // Close sidebar with Escape key
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && sidebarOpen) {
+            closeSidebar();
+          }
+        });
 
         // Touch events for swipe-to-close
         sheet.addEventListener("touchstart", (e) => {
@@ -1187,8 +1217,23 @@
             closeSidebar();
           }
         });
+
+        // Initialize: Push state to history when page loads
+        history.replaceState(null, null, window.location.href);
+        
+        // Add event listener for back button in navigation
+        document.addEventListener('click', (e) => {
+          // Check if the clicked element is a back button or similar
+          if (e.target.closest('[data-back="true"]') || 
+              (e.target.textContent.toLowerCase().includes('back') && 
+               e.target.closest('.nav-buttons'))) {
+            if (sidebarOpen) {
+              e.preventDefault();
+              closeSidebar();
+            }
+          }
+        });
       });
     </script>
   </body>
 </html>
-
