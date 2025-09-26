@@ -12,25 +12,23 @@
 <meta name="apple-mobile-web-app-title" content="Agro Suvidha">
 <link rel="apple-touch-icon" href="icons/icon-192x192.png">
   <title>Soil Quality Analysis</title>
-  <script src="https://unpkg.com/lucide@latest"></script> <!-- FIXED -->
-  <style>
+  <script src="https://unpkg.com/lucide@latest"></script> <style>
     body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: white;
-;
-  min-height: 100vh;
-  color: #01752c;
-}
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+      min-height: 100vh;
+      color: #01752c;
+    }
 
     .header {
-     background: linear-gradient(to right, #fbbf24, #f97316, #dc2626);
+      background: linear-gradient(to right, #fbbf24, #f97316, #dc2626);
       color: white;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .header h1 {
@@ -85,11 +83,11 @@
     }
     .btn-blue { background: #16a34a; color: white; }
     .btn-blue:hover { background: #16a34a;
-       padding: 10px 20px;      
+        padding: 10px 20px;
         font-size: 16px;
         min-width: 120px;
         border: 1px solid #045b15;
-     }
+      }
     .btn-green { background: #16a34a; color: white; }
     .btn-green:hover { background: #15803d; }
     .btn-gray {
@@ -107,12 +105,12 @@
     }
 
     .btn-gray:hover { background: rgba(255,255,255,0.3); }
-    .btn-outline { background: #16a34a; 
-        color: white; 
+    .btn-outline { background: #16a34a;
+        color: white;
         border: 1px solid #045b15;
-        padding: 10px 23px;      
+        padding: 10px 23px;
         font-size: 16px;
-        min-width: 120px;   
+        min-width: 120px;
     }
     .hidden { display: none; }
     .preview img {
@@ -143,6 +141,13 @@
       box-shadow: 0 6px 14px rgba(0,0,0,0.25);
     }
 
+    #results {
+      background: #f3f4f6;
+      padding: 12px;
+      border-radius: 8px;
+      white-space: pre-wrap;   /* Fixes the text wrapping issue */
+      word-wrap: break-word;   /* Ensures long, unbreakable words also wrap */
+    }
 
     .result-grid {
       display: grid;
@@ -189,13 +194,12 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
   <div class="header">
-<a href="index4.html">
-  <button class="btn-gray">
-    <i data-lucide="arrow-left"></i>
-  </button>
-</a>
+    <a href="index4.html">
+      <button class="btn-gray">
+        <i data-lucide="arrow-left"></i>
+      </button>
+    </a>
 
     <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px;">
       <i data-lucide="flask-conical"></i>
@@ -208,7 +212,6 @@
   </div>
 
   <div class="container">
-    <!-- Input Form -->
     <div id="form-card" class="card">
       <label for="crop">Crop Name:</label>
       <input type="text" id="crop" placeholder="Enter crop name">
@@ -228,8 +231,7 @@
       <div class="preview" style="margin-top:12px;">
     </div>
 
-      <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
-      <!-- Capture Button -->
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
       <button class="btn-capture" onclick="document.getElementById('camera-input').click()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5c.552 0 1 .448 1 1h2.586c.265 0 .52.105.707.293l1.414 1.414H21c1.105 0 2 .895 2 2v12c0 1.105-.895 2-2 2H3c-1.105 0-2-.895-2-2V7c0-1.105.895-2 2-2h2.293L6.707 3.293A.996.996 0 017.414 3H10c0-.552.448-1 1-1h1z"/>
@@ -237,18 +239,17 @@
         Capture Photo
       </button>
 
-      <!-- Analyze Button -->
       <button class="btn-green" onclick="analyzeSoil()" id="analyze-btn">
         <i class="lucide lucide-bar-chart-3"></i> Analyze Soil Quality
       </button>
     </div>
 
 
-  <!-- Results Card -->
     <div id="results-card" class="card hidden">
       <h3>Analysis Results</h3>
       <pre id="results" style="background:#f3f4f6; padding:12px; border-radius:8px;"></pre>
     </div>
+  </div>
 
 <script>
 // Initialize Lucide icons
