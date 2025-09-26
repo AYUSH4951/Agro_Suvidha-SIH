@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="theme-color" content="#4CAF50" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Agro Suvidha" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+    <title>Agro Suvidha - Welcome</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: Arial, sans-serif;
+      }
+
+      .welcome-screen {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+      }
+
+      /* Background Image */
+      .welcome-screen::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("Gemini_Generated_Image_5ux9x95ux9x95ux9.png") no-repeat
+          center center/cover;
+        z-index: -1;
+      }
+
+      .logo {
+        margin-bottom: 0.5rem;
+      }
+
+      /* Remove the circle */
+      .logo img {
+        width: 240px; /* bigger logo */
+        height: auto;
+        margin-bottom: 0.2rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-top: 0.2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      h2 {
+        margin: 0.2rem 0;
+      }
+
+      p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        max-width: 300px;
+        margin: 0 auto 2rem;
+        line-height: 1.5;
+      }
+
+      .btn {
+        background: white;
+        color: #2c7a2c;
+        padding: 12px 32px;
+        border-radius: 999px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.3s ease, background 0.3s ease;
+      }
+
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.9);
+        transform: scale(1.05);
+      }
+
+      .skip {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        border: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .skip:hover {
+        color: white;
+        text-decoration: underline;
+      }
+
+      .tap-hint {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        opacity: 0.7;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.7;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 1.2rem;
+        }
+
+        p {
+          font-size: 0.9rem;
+          max-width: 220px;
+        }
+
+        .logo img {
+          width: 120px;
+        }
+
+        .btn {
+          padding: 8px 20px;
+          font-size: 0.8rem;
+        }
+
+        .skip {
+          font-size: 0.8rem;
+          top: 10px;
+          right: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="welcome-screen">
+      <!-- Skip button -->
+      <a href="index4.html" class="skip">Skip to Dashboard</a>
+
+      <div class="content">
+        <!-- Logo -->
+        <div class="logo">
+          <img src="leaf img.png" alt="logo image" />
+          <h1>Agro Suvidha</h1>
+        </div>
+
+        <!-- Tagline -->
+        <h2>THE NEW ERA OF</h2>
+        <h2>AGRICULTURE ADVISORY</h2>
+        <p>Expert agricultural advisory for better farming decisions</p>
+
+        <!-- Action Button -->
+        <a href="index2.html" class="btn">Get Started</a>
+      </div>
+    </div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("Service Worker: Registered"))
+            .catch((err) => console.log(`Service Worker: Error: ${err}`));
+        });
+      }
+    </script>
+  </body>
+</html>

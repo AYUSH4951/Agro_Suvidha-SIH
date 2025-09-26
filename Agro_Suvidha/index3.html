@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="theme-color" content="#4CAF50" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Agro Suvidha" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+    <title>Agro Suvidha Login</title>
+    <style>
+      :root {
+        --primary: #2a7a3a;
+        --primary-light: #e0f3e8;
+        --primary-border: #c2e5cc;
+      }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right, #e6f7f1, #fdfdfd, #eef5ff);
+        display: flex;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+      }
+      .container {
+        width: 100%;
+        max-width: 420px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .logo-container {
+        display: flex;
+        align-items: center; /* vertically centers logo and text */
+        gap: 6px; /* space between logo and text */
+      }
+      .logo-icon svg,
+      .logo-icon img {
+        width: 150px; /* control logo size */
+        height: 150px;
+      }
+
+      .logo-text {
+        font-size: 20px; /* adjust as needed */
+        font-weight: bold;
+        align-items: center;
+      }
+
+      .logo h2 {
+        color: var(--primary);
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: var(--primary-light);
+        border: 1px solid var(--primary-border);
+        color: var(--primary);
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .language {
+        margin-top: 10px;
+      }
+      select {
+        padding: 6px;
+        border-radius: 6px;
+        border: 1px solid var(--primary-border);
+        font-size: 14px;
+      }
+      .hero {
+        position: relative;
+        height: 130px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to right,
+          rgba(42, 122, 58, 0.6),
+          rgba(42, 122, 58, 0.4)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        padding: 10px;
+      }
+      .hero-overlay h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .hero-overlay p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid var(--primary-border);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      }
+      .card h3 {
+        text-align: center;
+        color: var(--primary);
+        margin-bottom: 15px;
+      }
+      .toggle-buttons {
+        display: flex;
+        background: #f0f0f0;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      .toggle-buttons button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 6px;
+        transition: 0.3s;
+      }
+      .toggle-buttons button.active {
+        background: var(--primary);
+        color: white;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--primary-border);
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .password-wrapper {
+        position: relative;
+      }
+      .password-wrapper button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: gray;
+      }
+      .options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        margin-bottom: 15px;
+      }
+      .options label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+      }
+      .login-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .signup {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      .signup a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .card {
+          padding: 15px;
+        }
+        .hero {
+          height: 100px;
+        }
+        .logo h2 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">
+          <div class="logo-icon"><img src="leaflogo.png" /></div>
+          <h1 data-i18n="welcome">Agro Suvidha</h1>
+        </div>
+        <div class="badge">Step 2 of 2</div>
+        <div class="language">
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <img
+          src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+          alt="Smart farming"
+        />
+        <div class="hero-overlay">
+          <div>
+            <h1 id="welcomeText">Welcome Back</h1>
+            <p id="subtitleText">Modern Agricultural Management</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="card">
+        <h3 id="loginTitle">Sign In</h3>
+
+        <!-- Toggle -->
+        <div class="toggle-buttons">
+          <button id="emailBtn" class="active">Email</button>
+          <button id="phoneBtn">Phone</button>
+        </div>
+
+        <!-- Email/Phone Input -->
+        <div class="form-group">
+          <label id="loginLabel">Email Address</label>
+          <input
+            id="loginInput"
+            type="email"
+            placeholder="farmer@example.com"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="form-group password-wrapper">
+          <label id="passwordLabel">Password</label>
+          <input
+            id="passwordInput"
+            type="password"
+            placeholder="Enter your password"
+          />
+          <button type="button" id="togglePassword">👁</button>
+        </div>
+
+        <!-- Options -->
+        <div class="options">
+          <label
+            ><input type="checkbox" id="remember" />
+            <span id="rememberText">Remember me</span></label
+          >
+          <a
+            href="#"
+            id="forgotText"
+            style="color: var(--primary); text-decoration: none"
+            >Forgot Password?</a
+          >
+        </div>
+
+        <!-- Sign in or create account -->
+        <button
+          class="login-btn"
+          onclick="window.location.href='./index4.html'"
+        >
+          <span id="loginBtnText">Sign In</span>
+        </button>
+
+        <!-- Sign Up -->
+        <div class="signup">
+          <span id="noAccountText">Don't have an account?</span>
+          <a href="#" id="signUpText">Sign Up</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const translations = {
+        en: {
+          welcome: "Welcome Back",
+          subtitle: "Modern Agricultural Management",
+          loginTitle: "Sign In",
+          email: "Email Address",
+          phone: "Phone Number",
+          password: "Password",
+          rememberMe: "Remember me",
+          login: "Sign In",
+          forgotPassword: "Forgot Password?",
+          noAccount: "Don't have an account?",
+          signUp: "Sign Up",
+        },
+        hi: {
+          welcome: "स्वागत है",
+          subtitle: "आधुनिक कृषि प्रबंधन",
+          loginTitle: "लॉग इन करें",
+          email: "ईमेल",
+          phone: "फोन नंबर",
+          password: "पासवर्ड",
+          rememberMe: "मुझे याद रखें",
+          login: "लॉग इन",
+          forgotPassword: "पासवर्ड भूल गए?",
+          noAccount: "कोई खाता नहीं है?",
+          signUp: "साइन अप करें",
+        },
+        pa: {
+          welcome: "ਜੀ ਆਇਆਂ ਨੂੰ",
+          subtitle: "ਆਧੁਨਿਕ ਖੇਤੀਬਾੜੀ ਪ੍ਰਬੰਧਨ",
+          loginTitle: "ਲਾਗ ਇਨ ਕਰੋ",
+          email: "ਈਮੇਲ",
+          phone: "ਫੋਨ ਨੰਬਰ",
+          password: "ਪਾਸਵਰਡ",
+          rememberMe: "ਮੈਨੂੰ ਯਾਦ ਰੱਖੋ",
+          login: "ਲਾਗ ਇਨ",
+          forgotPassword: "ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?",
+          noAccount: "ਕੋਈ ਖਾਤਾ ਨਹੀਂ?",
+          signUp: "ਸਾਈਨ ਅਪ ਕਰੋ",
+        },
+        bn: {
+          welcome: "ফিরে আসার জন্য স্বাগতম",
+          subtitle: "আধুনিক কৃষি ব্যবস্থাপনা",
+          loginTitle: "লগ ইন করুন",
+          email: "ইমেইল",
+          phone: "ফোন নম্বর",
+          password: "পাসওয়ার্ড",
+          rememberMe: "আমাকে মনে রাখুন",
+          login: "লগ ইন",
+          forgotPassword: "পাসওয়ার্ড ভুলে গেছেন?",
+          noAccount: "একটি অ্যাকাউন্ট নেই?",
+          signUp: "সাইন আপ করুন",
+        },
+      };
+
+      const emailBtn = document.getElementById("emailBtn");
+      const phoneBtn = document.getElementById("phoneBtn");
+      const loginLabel = document.getElementById("loginLabel");
+      const loginInput = document.getElementById("loginInput");
+      const togglePassword = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("passwordInput");
+      const langSelect = document.getElementById("languageSelect");
+
+      // Text elements
+      const welcomeText = document.getElementById("welcomeText");
+      const subtitleText = document.getElementById("subtitleText");
+      const loginTitle = document.getElementById("loginTitle");
+      const passwordLabel = document.getElementById("passwordLabel");
+      const rememberText = document.getElementById("rememberText");
+      const forgotText = document.getElementById("forgotText");
+      const loginBtnText = document.getElementById("loginBtnText");
+      const noAccountText = document.getElementById("noAccountText");
+      const signUpText = document.getElementById("signUpText");
+
+      // Switch between email/phone
+      emailBtn.onclick = () => {
+        emailBtn.classList.add("active");
+        phoneBtn.classList.remove("active");
+        loginLabel.textContent = translations[langSelect.value].email;
+        loginInput.type = "email";
+        loginInput.placeholder = "farmer@example.com";
+      };
+      phoneBtn.onclick = () => {
+        phoneBtn.classList.add("active");
+        emailBtn.classList.remove("active");
+        loginLabel.textContent = translations[langSelect.value].phone;
+        loginInput.type = "tel";
+        loginInput.placeholder = "+91 98765 43210";
+      };
+
+      // Toggle password visibility
+      togglePassword.onclick = () => {
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          togglePassword.textContent = "🙈";
+        } else {
+          passwordInput.type = "password";
+          togglePassword.textContent = "👁";
+        }
+      };
+
+      // Language change
+      langSelect.onchange = () => {
+        const t = translations[langSelect.value];
+        welcomeText.textContent = t.welcome;
+        subtitleText.textContent = t.subtitle;
+        loginTitle.textContent = t.loginTitle;
+        passwordLabel.textContent = t.password;
+        rememberText.textContent = t.rememberMe;
+        forgotText.textContent = t.forgotPassword;
+        loginBtnText.textContent = t.login;
+        noAccountText.textContent = t.noAccount;
+        signUpText.textContent = t.signUp;
+
+        if (emailBtn.classList.contains("active")) {
+          loginLabel.textContent = t.email;
+        } else {
+          loginLabel.textContent = t.phone;
+        }
+      };
+
+      // Dummy login
+      function handleLogin() {
+        if (!loginInput.value || !passwordInput.value) {
+          alert("Please fill all fields.");
+          return;
+        }
+        alert("✅ Login successful!");
+      }
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("Service Worker: Registered"))
+            .catch((err) => console.log(`Service Worker: Error: ${err}`));
+        });
+      }
+    </script>
+  </body>
+</html>

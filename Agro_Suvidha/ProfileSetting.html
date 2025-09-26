@@ -1,0 +1,203 @@
+<!DOCTYPE ahtml>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#4CAF50" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Agro Suvidha" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+
+    <title>Profile Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .header-bg {
+            background-color: #3C6D39;
+            height: 60px;
+        }
+        .content-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .icon-bg {
+            background-color: #ECF5EB;
+        }
+        .update-button {
+            background-color: #3C6D39;
+        }
+        .update-button:hover {
+            background-color: #335d31;
+        }
+        .input-bg {
+            background-color: #F3F8F2;
+            border-color: transparent;
+        }
+        .input-bg:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(60, 109, 57, 0.5);
+        }
+        .nav-link {
+            color: #3C6D39;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/lucide-icons@0.292.0/dist/lucide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                console.error("Lucide icons could not be initialized: lucide is not defined.");
+            }
+
+            // Function to show a custom message box
+            function showMessage(message) {
+                const messageBox = document.getElementById('messageBox');
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden');
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 3000);
+            }
+
+            // Get all input elements
+            const farmerNameInput = document.getElementById('farmerName');
+            const locationInput = document.getElementById('location');
+            const landSizeInput = document.getElementById('landSize');
+            const soilTypeInput = document.getElementById('soilType');
+            const preferredCropsInput = document.getElementById('preferredCrops');
+            const updateButton = document.getElementById('updateProfileBtn');
+
+            // Add event listener to the button
+            updateButton.addEventListener('click', () => {
+                const profileData = {
+                    farmerName: farmerNameInput.value,
+                    location: locationInput.value,
+                    landSize: landSizeInput.value,
+                    soilType: soilTypeInput.value,
+                    preferredCrops: preferredCropsInput.value,
+                };
+                
+                // Show success message
+                showMessage("Profile updated successfully!");
+                console.log("Updated Profile:", profileData);
+            });
+        });
+    </script>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <header class="header px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <span class="lucide-icon text-green-800" data-lucide-icon="Leaf" data-size="24"></span>
+            <span class="text-xl font-bold text-gray-800">Agro Suvidha</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- Removed navigation links here -->
+            <a href="index4.html" class="text-gray-500 hover:text-gray-700">
+                <span class="lucide-icon" data-lucide-icon="ArrowLeft" data-size="20"></span>
+            </a>
+            <a href="#" class="text-gray-500 hover:text-gray-700">
+                <span class="lucide-icon" data-lucide-icon="Search" data-size="20"></span>
+            </a>
+            <a href="#" class="text-gray-500 hover:text-gray-700">
+                <span class="lucide-icon" data-lucide-icon="HelpCircle" data-size="20"></span>
+            </a>
+        </div>
+    </header>
+
+
+    <div class="p-6 md:p-12 flex-grow">
+        <div class="max-w-4xl mx-auto space-y-6">
+
+            <!-- Header and Navigation -->
+            <div class="mb-8 flex items-center text-gray-700">
+                <a href="index4.html" class="flex items-center text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2"><path d="m15 18-6-6 6-6"/></svg>
+                    <span class="text-sm font-medium">Back</span>
+                </a>
+            </div>
+
+            <!-- Profile Settings Card -->
+            <div class="content-card p-6 md:p-8 space-y-6">
+                
+                <!-- Card Header -->
+                <div class="flex items-center space-x-4 pb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">Profile Settings</h2>
+                        <p class="text-sm text-gray-500">Update your personal and farm information</p>
+                    </div>
+                </div>
+
+                <!-- Form Section -->
+                <div class="space-y-6">
+                    <!-- Farmer Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="farmerName" class="text-sm font-medium text-gray-700">Farmer Name</label>
+                            <input id="farmerName" type="text" class="w-full h-10 rounded-lg px-4 text-gray-800 input-bg" placeholder="Your Name">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="location" class="text-sm font-medium text-gray-700">Location</label>
+                            <input id="location" type="text" class="w-full h-10 rounded-lg px-4 text-gray-800 input-bg" placeholder="Your Location">
+                        </div>
+                    </div>
+
+                    <!-- Separator -->
+                    <hr class="border-gray-200">
+
+                    <!-- Farm Details -->
+                    <div class="space-y-4">
+                        <h3 class="text-md font-medium text-gray-900">Farm Details</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <label for="landSize" class="text-sm font-medium text-gray-700">Land Size (acres)</label>
+                                <input id="landSize" type="text" class="w-full h-10 rounded-lg px-4 text-gray-800 input-bg" placeholder="Your Land size in acres">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="soilType" class="text-sm font-medium text-gray-700">Soil Type</label>
+                                <input id="soilType" type="text" class="w-full h-10 rounded-lg px-4 text-gray-800 input-bg" placeholder="Enter Soil type">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="preferredCrops" class="text-sm font-medium text-gray-700">Preferred Crops</label>
+                                <input id="preferredCrops" type="text" class="w-full h-10 rounded-lg px-4 text-gray-800 input-bg" placeholder="Select Perferred Crops">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Update Button -->
+                    <button id="updateProfileBtn" class="update-button text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors w-full md:w-auto">Update Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Box -->
+    <div id="messageBox" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-lg shadow-lg hidden"></div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("Service Worker: Registered"))
+            .catch((err) => console.log(`Service Worker: Error: ${err}`));
+        });
+      }
+    </script>
+</body>
+</html>

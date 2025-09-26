@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#4CAF50">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agro Suvidha">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <title>Soil Quality Analysis</title>
+  <script src="https://unpkg.com/lucide@latest"></script> <!-- FIXED -->
+  <style>
+    body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: white;
+;
+  min-height: 100vh;
+  color: #01752c;
+}
+
+    .header {
+     background: linear-gradient(to right, #fbbf24, #f97316, #dc2626);
+      color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .header p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .container {
+      padding: 24px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      padding: 10px;
+      text-align: left;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-sizing: border-box; /* FIXED overflow */
+    }
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-blue { background: #16a34a; color: white; }
+    .btn-blue:hover { background: #16a34a;
+       padding: 10px 20px;      
+        font-size: 16px;
+        min-width: 120px;
+        border: 1px solid #045b15;
+     }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-green:hover { background: #15803d; }
+    .btn-gray {
+      background: linear-gradient(to bottom right, #fde68a, #fbbf24, #f59e0b);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      width: 55px;
+      height: 55px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 22px;
+    }
+
+    .btn-gray:hover { background: rgba(255,255,255,0.3); }
+    .btn-outline { background: #16a34a; 
+        color: white; 
+        border: 1px solid #045b15;
+        padding: 10px 23px;      
+        font-size: 16px;
+        min-width: 120px;   
+    }
+    .hidden { display: none; }
+    .preview img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+    }
+
+    .btn-capture {
+      background: linear-gradient(to bottom right, #fde68a, #fbbf24, #f59e0b); /* lighter orange */
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-capture:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    }
+
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    .metric {
+      background: #eff6ff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #bfdbfe;
+    }
+    .nutrient {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .bg-green { background: #dcfce7; color: #166534; }
+    .bg-yellow { background: #fef9c3; color: #854d0e; }
+    .bg-red { background: #fee2e2; color: #991b1b; }
+    .audio-bar {
+      height: 4px;
+      background: #d1d5db;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .audio-progress {
+      height: 4px;
+      background: #2563eb;
+      width: 0%;
+      transition: width 0.3s linear;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+<a href="index4.html">
+  <button class="btn-gray">
+    <i data-lucide="arrow-left"></i>
+  </button>
+</a>
+
+    <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px;">
+      <i data-lucide="flask-conical"></i>
+    </div>
+    <div>
+      <h1>Soil Moisture Fertilizer</h1>
+      <h2>Recommendation</h2>
+      <p>AI-powered soil analysis and recommendations</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Input Form -->
+    <div id="form-card" class="card">
+      <label for="crop">Crop Name:</label>
+      <input type="text" id="crop" placeholder="Enter crop name">
+
+      <button class="btn-blue" id="voice-btn">
+        <i data-lucide="mic"></i>  Voice Input
+      </button>
+
+      <label>Upload Soil Image:</label>
+      <div class="flex">
+        <button class="btn-outline" onclick="document.getElementById('file-input').click()">Choose File</button>
+        <span id="file-name" style="margin-left:8px;">File shown here</span>
+      </div>
+      <input type="file" id="file-input" accept="image/*" class="hidden" onchange="previewFile(event)">
+      <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="previewFile(event)">
+
+      <div class="preview" style="margin-top:12px;">
+    </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
+      <!-- Capture Button -->
+      <button class="btn-capture" onclick="document.getElementById('camera-input').click()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5c.552 0 1 .448 1 1h2.586c.265 0 .52.105.707.293l1.414 1.414H21c1.105 0 2 .895 2 2v12c0 1.105-.895 2-2 2H3c-1.105 0-2-.895-2-2V7c0-1.105.895-2 2-2h2.293L6.707 3.293A.996.996 0 017.414 3H10c0-.552.448-1 1-1h1z"/>
+        </svg>
+        Capture Photo
+      </button>
+
+      <!-- Analyze Button -->
+      <button class="btn-green" onclick="analyzeSoil()" id="analyze-btn">
+        <i class="lucide lucide-bar-chart-3"></i> Analyze Soil Quality
+      </button>
+    </div>
+
+
+  <!-- Results Card -->
+    <div id="results-card" class="card hidden">
+      <h3>Analysis Results</h3>
+      <pre id="results" style="background:#f3f4f6; padding:12px; border-radius:8px;"></pre>
+    </div>
+
+<script>
+// Initialize Lucide icons
+if (typeof lucide !== 'undefined') {
+  lucide.createIcons();
+}
+
+// Voice input
+const voiceBtn = document.getElementById("voice-btn");
+const cropInput = document.getElementById("crop");
+
+// Set default language
+let language = "en"; // Default
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get("lang")) {
+  language = urlParams.get("lang");
+}
+
+// Add voice recognition
+voiceBtn.addEventListener("click", () => {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert('Voice recognition not supported in this browser.');
+    return;
+  }
+
+  voiceBtn.disabled = true;
+  voiceBtn.innerHTML = '<i data-lucide="mic"></i> Listening...';
+
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = language;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.start();
+
+  recognition.onresult = event => {
+    const transcript = event.results[0][0].transcript;
+    cropInput.value = transcript;
+    voiceBtn.disabled = false;
+    voiceBtn.innerHTML = '<i data-lucide="mic"></i> Voice Input';
+  };
+
+  recognition.onerror = event => {
+    alert("Voice recognition error: " + event.error);
+    voiceBtn.disabled = false;
+    voiceBtn.innerHTML = '<i data-lucide="mic"></i> Voice Input';
+  };
+
+  recognition.onspeechend = () => {
+    recognition.stop();
+    voiceBtn.disabled = false;
+    voiceBtn.innerHTML = '<i data-lucide="mic"></i> Voice Input';
+  };
+});
+
+// Preview image (already exists but keep it)
+function previewFile(event) {
+  const file = event.target.files[0];
+  const previewContainer = document.querySelector(".preview");
+  if (!previewContainer) return;
+
+  previewContainer.innerHTML = "";
+
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.style.maxWidth = "100%";
+      img.style.height = "auto";
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+
+    const fileNameElement = document.getElementById("file-name");
+    if (fileNameElement) fileNameElement.innerText = file.name;
+  }
+}
+
+// Analyze Soil function updated with backend and audio
+async function analyzeSoil() {
+  const btn = document.getElementById("analyze-btn");
+  const cropElement = document.getElementById("crop");
+  const fileInput = document.getElementById("file-input");
+
+  const selectedFile = fileInput.files[0];
+  const crop = cropElement.value.trim();
+
+  if (!crop) { alert("Please enter a crop name!"); return; }
+  if (!selectedFile) { alert("Please select a soil image!"); return; }
+
+  btn.disabled = true;
+  btn.innerText = "Analyzing...";
+
+  try {
+    const base64Image = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(selectedFile);
+    });
+
+    const response = await fetch("https://soil-moisture-20.onrender.com/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        language: language,
+        crop_name: crop,
+        soil_image_base64: base64Image
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.detail || "Server error");
+    }
+
+    const data = await response.json();
+
+    // Show results
+    const resultsCard = document.getElementById("results-card");
+    resultsCard.classList.remove("hidden");
+    document.getElementById("results").textContent = data.text || JSON.stringify(data, null, 2);
+
+    // Play audio
+    let audioPlayer = document.getElementById("audioPlayer");
+    if (!audioPlayer) {
+      audioPlayer = document.createElement("audio");
+      audioPlayer.id = "audioPlayer";
+      audioPlayer.controls = true;
+      audioPlayer.style.marginTop = "12px";
+      document.querySelector(".container").appendChild(audioPlayer);
+    }
+    audioPlayer.src = 'https://soil-moisture-20.onrender.com/audio/' + data.audio_file;
+    audioPlayer.style.display = "block";
+    audioPlayer.play();
+
+  } catch (error) {
+    console.error(error);
+    alert("Error: " + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Analyze Soil Quality";
+  }
+}
+
+// Trigger camera input
+document.getElementById("camera-input").addEventListener("change", previewFile);
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker: Registered'))
+        .catch(err => console.log(`Service Worker: Error: ${err}`));
+    });
+  }
+</script>
+
+</body>
+</html>

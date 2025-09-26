@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="theme-color" content="#4CAF50" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Agro Suvidha" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+    <title>Fast Auto-Detect Weather Dashboard</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Open Sans", "Helvetica Neue",
+          sans-serif;
+        line-height: 1.5;
+        color: #374151;
+        background-color: #f9fafb;
+      }
+
+      /* Language Selector */
+      .language-selector {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .language-dropdown {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: white;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      .language-dropdown:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      /* Dashboard Container */
+      .weather-dashboard {
+        min-height: 100vh;
+        padding: 80px 16px 16px 16px;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background-color: #ddf6d2;
+      }
+
+      @media (min-width: 768px) {
+        .weather-dashboard {
+          padding: 80px 24px 24px 24px;
+          gap: 24px;
+        }
+      }
+
+      /* Topbar */
+      .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: #059669;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+
+      .topbar .logo {
+        font-size: 25px;
+        font-weight: bold;
+        padding-left: 4px;
+      }
+
+      .topbar .nav-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+
+      .topbar .nav-buttons button {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .topbar .nav-buttons button:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .topbar .nav-buttons .active-nav-btn {
+        background: transparent;
+      }
+      @media (max-width: 480px) {
+        .weather-details {
+          flex-direction: column;
+          gap: 0.8rem;
+        }
+
+        .weather-details div {
+          justify-content: center;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .services {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .topbar .logo {
+          font-size: 22px;
+        }
+        .topbar .nav-buttons {
+          gap: 2px;
+        }
+        .topbar .nav-buttons button {
+          padding: 6px 8px;
+          font-size: 14px;
+        }
+      }
+
+
+      /* push content below topbar */
+      body {
+        padding-top: 70px; /* Prevent overlap */
+      }
+
+      /* Header */
+      .dashboard-header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        justify-content: space-between;
+      }
+
+      @media (min-width: 768px) {
+        .dashboard-header {
+          flex-direction: row;
+          align-items: center;
+          gap: 0;
+        }
+      }
+
+      .dashboard-title {
+        font-size: 3rem;
+        font-weight: 600;
+        color: #04491b;
+        margin-bottom: 4px;
+        font-style: revert;
+      }
+
+      @media (min-width: 768px) {
+        .dashboard-title {
+          font-size: 1.5rem;
+        }
+      }
+
+      .dashboard-subtitle {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      @media (min-width: 768px) {
+        .dashboard-subtitle {
+          font-size: 16px;
+        }
+      }
+
+      .last-updated-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 6px;
+        font-size: 14px;
+        align-self: flex-start;
+      }
+
+      @media (min-width: 768px) {
+        .last-updated-badge {
+          align-self: auto;
+        }
+      }
+
+      /* Cards */
+      .card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 16px 16px 0 16px;
+      }
+
+      @media (min-width: 768px) {
+        .card-header {
+          padding: 24px 24px 0 24px;
+        }
+      }
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .card-content {
+        padding: 16px;
+      }
+
+      @media (min-width: 768px) {
+        .card-content {
+          padding: 24px;
+        }
+      }
+
+      /* Icons */
+      .icon-sm {
+        width: 16px;
+        height: 16px;
+      }
+
+      .icon-md {
+        width: 20px;
+        height: 20px;
+      }
+
+      .weather-icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .text-yellow-500 {
+        color: #eab308;
+      }
+      .text-blue-500 {
+        color: #3b82f6;
+      }
+      .text-gray-500 {
+        color: #6b7280;
+      }
+      .text-purple-500 {
+        color: #a855f7;
+      }
+      .text-green-500 {
+        color: #22c55e;
+      }
+      .text-orange-500 {
+        color: #f97316;
+      }
+      .text-blue-600 {
+        color: #2563eb;
+      }
+      .text-orange-600 {
+        color: #ea580c;
+      }
+      .text-red-600 {
+        color: #dc2626;
+      }
+      .text-purple-600 {
+        color: #9333ea;
+      }
+      .text-green-600 {
+        color: #16a34a;
+      }
+
+      /* Current Weather Section */
+      .current-weather-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 1024px) {
+        .current-weather-section {
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+      }
+
+      .current-weather-main {
+        margin-bottom: 16px;
+      }
+
+      .temperature-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .temperature {
+        font-size: 2.25rem;
+        font-weight: bold;
+        color: #3b82f6;
+      }
+
+      @media (min-width: 768px) {
+        .temperature {
+          font-size: 3rem;
+        }
+      }
+
+      .condition {
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .feels-like {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .weather-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        font-size: 14px;
+      }
+
+      .weather-detail {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Hero Image */
+      .hero-image-container {
+        position: relative;
+        height: 192px;
+      }
+
+      @media (min-width: 768px) {
+        .hero-image-container {
+          height: 256px;
+        }
+      }
+
+      .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(59, 130, 246, 0.6),
+          transparent
+        );
+      }
+
+      .hero-text {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        color: white;
+      }
+
+      .hero-title {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+
+      @media (min-width: 768px) {
+        .hero-title {
+          font-size: 16px;
+        }
+      }
+
+      .hero-subtitle {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+
+      @media (min-width: 768px) {
+        .hero-subtitle {
+          font-size: 14px;
+        }
+      }
+
+      /* Forecast */
+      .forecast-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 768px) {
+        .forecast-grid {
+          grid-template-columns: repeat(7, 1fr);
+        }
+      }
+
+      .forecast-item {
+        text-align: center;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+      }
+
+      .forecast-item:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+
+      .forecast-day {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+
+      .forecast-date {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 8px;
+      }
+
+      .forecast-icon {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 8px auto;
+        color: #2563eb;
+      }
+
+      .forecast-temps {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 4px;
+      }
+
+      .forecast-high {
+        font-weight: 500;
+      }
+
+      .forecast-low {
+        color: #6b7280;
+      }
+
+      .forecast-condition {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+
+      .forecast-details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .forecast-detail {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      /* Bottom Section */
+      .bottom-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      @media (min-width: 1024px) {
+        .bottom-section {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      /* Alerts */
+      .alerts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .alert-item {
+        padding: 12px;
+        border: 1px solid;
+        border-radius: 8px;
+      }
+
+      .alert-item.priority-high {
+        background-color: #fef2f2;
+        color: #991b1b;
+        border-color: #fecaca;
+      }
+
+      .alert-item.priority-medium {
+        background-color: #fffbeb;
+        color: #92400e;
+        border-color: #fed7aa;
+      }
+
+      .alert-item.priority-low {
+        background-color: #eff6ff;
+        color: #1e40af;
+        border-color: #bfdbfe;
+      }
+
+      .alert-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .alert-icon {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+      }
+
+      .alert-details {
+        flex: 1;
+      }
+
+      .alert-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .alert-type {
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .alert-priority {
+        padding: 2px 8px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        font-size: 12px;
+        background: transparent;
+      }
+
+      .alert-message {
+        font-size: 14px;
+      }
+
+      /* Soil Conditions */
+      .soil-temperature {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        background-color: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .soil-temp-label {
+        font-weight: 500;
+      }
+
+      .moisture-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .moisture-title {
+        font-weight: 500;
+      }
+
+      .moisture-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .moisture-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .moisture-field {
+        font-size: 14px;
+      }
+
+      .moisture-data {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .moisture-level {
+        font-size: 14px;
+      }
+
+      .moisture-status {
+        padding: 2px 8px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        font-size: 12px;
+        background: transparent;
+      }
+
+      .moisture-status.optimal {
+        color: #16a34a;
+      }
+      .moisture-status.good {
+        color: #2563eb;
+      }
+      .moisture-status.low {
+        color: #ea580c;
+      }
+      .moisture-status.high {
+        color: #a855f7;
+      }
+
+      /* Badge component styles */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid transparent;
+      }
+
+      .badge-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        border-color: #e2e8f0;
+      }
+
+      .badge-outline {
+        background-color: transparent;
+        border-color: currentColor;
+      }
+
+      /* Utility classes */
+      .text-muted-foreground {
+        color: #6b7280;
+      }
+
+      .text-primary {
+        color: #3b82f6;
+      }
+
+      .bg-muted {
+        background-color: #f9fafb;
+      }
+
+      .transition-colors {
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 767px) {
+        .current-weather-section {
+          gap: 16px;
+        }
+
+        .forecast-item {
+          padding: 16px;
+        }
+
+        .temperature-display {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .weather-details {
+          gap: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="language-selector">
+      <select id="languageSelect" class="language-dropdown">
+        <option value="en">English</option>
+        <option value="hi">हिंदी (Hindi)</option>
+        <option value="bn">বাংলা (Bengali)</option>
+        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+      </select>
+    </div>
+
+    <div class="topbar">
+      <div class="logo">Agro Suvidha</div>
+      <div class="nav-buttons">
+        <button onclick="window.location.href='index4.html'">Home</button>
+        <button onclick="window.location.href='index6.html'">Crops</button>
+        <button>Weather</button>
+        <button onclick="window.location.href='about_us.html'">About Us</button>
+      </div>
+    </div>
+
+    <div class="weather-dashboard">
+      <div class="dashboard-header">
+        <div class="header-content">
+          <h1 class="dashboard-title" data-translate="weather.title">
+            Weather Dashboard
+          </h1>
+          <p class="dashboard-subtitle">Detecting your location...</p>
+        </div>
+        <div class="last-updated-badge">
+          <i data-lucide="calendar" class="icon-sm"></i>
+          <span id="lastUpdated" data-translate="weather.lastUpdated"
+            >Last updated: --</span
+          >
+        </div>
+      </div>
+
+      <div class="current-weather-section">
+        <div class="current-weather-card card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i data-lucide="sun" class="icon-md text-yellow-500"></i>
+              <span data-translate="weather.currentWeather"
+                >Current Weather</span
+              >
+            </h3>
+          </div>
+          <div class="card-content">
+            <div class="current-weather-main">
+              <div class="temperature-display">
+                <i
+                  id="currentWeatherIcon"
+                  data-lucide="sun"
+                  class="weather-icon text-yellow-500"
+                ></i>
+                <div class="temperature-info">
+                  <p id="temperature" class="temperature">--°C</p>
+                  <p id="condition" class="condition">--</p>
+                  <p id="feelsLike" class="feels-like">Feels like --°C</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="weather-details">
+              <div class="weather-detail">
+                <i data-lucide="droplets" class="icon-sm text-blue-500"></i>
+                <span id="humidity"
+                  ><span data-translate="weather.humidity">Humidity</span>:
+                  --%</span
+                >
+              </div>
+              <div class="weather-detail">
+                <i data-lucide="wind" class="icon-sm text-gray-500"></i>
+                <span id="wind"
+                  ><span data-translate="weather.windSpeed">Wind</span>: --
+                  km/h</span
+                >
+              </div>
+              <div class="weather-detail">
+                <i data-lucide="gauge" class="icon-sm text-purple-500"></i>
+                <span id="pressure"
+                  ><span data-translate="weather.pressure">Pressure</span>: --
+                  hPa</span
+                >
+              </div>
+              <div class="weather-detail">
+                <i data-lucide="eye" class="icon-sm text-green-500"></i>
+                <span id="visibility"
+                  ><span data-translate="weather.visibility">Visibility</span>:
+                  -- km</span
+                >
+              </div>
+              <div class="weather-detail">
+                <i data-lucide="sun" class="icon-sm text-orange-500"></i>
+                <span id="uvIndex"
+                  ><span data-translate="weather.uvIndex">UV Index</span>:
+                  --</span
+                >
+              </div>
+              <div class="weather-detail">
+                <i data-lucide="thermometer" class="icon-sm text-blue-500"></i>
+                <span id="dewPoint">Dew Point: --°C</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-image-card card">
+          <div class="hero-image-container">
+            <img
+              src="https://images.unsplash.com/photo-1622459298324-7cb61366c569?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXJtJTIwZmllbGRzJTIwYmx1ZSUyMHNreSUyMHdlYXRoZXJ8ZW58MXx8fHwxNzU2NTQyNDE2fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+              alt="Farm field under blue sky"
+              class="hero-image"
+              onerror="this.style.display='none'"
+            />
+            <div class="hero-overlay"></div>
+            <div class="hero-text">
+              <p id="heroTitle" class="hero-title">
+                Perfect weather for field work
+              </p>
+              <p id="heroSubtitle" class="hero-subtitle">
+                Optimal conditions across all fields
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="forecast-card card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i data-lucide="calendar" class="icon-md text-blue-600"></i>
+            <span data-translate="weather.forecast">7-Day Forecast</span>
+          </h3>
+        </div>
+        <div class="card-content">
+          <div class="forecast-grid" id="forecastGrid"></div>
+        </div>
+      </div>
+
+      <div class="bottom-section">
+        <div class="farming-alerts-card card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i
+                data-lucide="alert-triangle"
+                class="icon-md text-orange-600"
+              ></i>
+              <span data-translate="weather.farmingAdvice">Farming Advice</span>
+            </h3>
+          </div>
+          <div class="card-content">
+            <div class="alerts-list" id="alertsList"></div>
+          </div>
+        </div>
+
+        <div class="soil-conditions-card card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i data-lucide="thermometer" class="icon-md text-orange-600"></i>
+              <span>Soil Conditions</span>
+            </h3>
+          </div>
+          <div class="card-content">
+            <div class="soil-temperature">
+              <span class="soil-temp-label">Soil Temperature</span>
+              <span id="soilTemp" class="soil-temp-value">--°C</span>
+            </div>
+
+            <div class="moisture-section">
+              <h4 class="moisture-title">Field-by-Field Moisture Levels</h4>
+              <div class="moisture-list" id="moistureList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- STATIC DATA AND TRANSLATIONS ---
+      const translations = {
+        en: {
+          weather: {
+            title: "Weather Dashboard",
+            currentWeather: "Current Weather",
+            forecast: "7-Day Forecast",
+            farmingAdvice: "Farming Advice",
+            humidity: "Humidity",
+            windSpeed: "Wind",
+            pressure: "Pressure",
+            visibility: "Visibility",
+            uvIndex: "UV Index",
+            today: "Today",
+            tomorrow: "Tomorrow",
+            lastUpdated: "Last updated",
+          },
+        },
+        hi: {
+          weather: {
+            title: "मौसम डैशबोर्ड",
+            currentWeather: "वर्तमान मौसम",
+            forecast: "7-दिन का पूर्वानुमान",
+            farmingAdvice: "कृषि सलाह",
+            humidity: "आर्द्रता",
+            windSpeed: "हवा",
+            pressure: "दबाव",
+            visibility: "दृश्यता",
+            uvIndex: "यूवी इंडेक्स",
+            today: "आज",
+            tomorrow: "कल",
+            lastUpdated: "अंतिम अपडेट",
+          },
+        },
+        bn: {
+          weather: {
+            title: "আবহাওয়া ড্যাশবোর্ড",
+            currentWeather: "বর্তমান আবহাওয়া",
+            forecast: "৭-দিনের পূর্বাভাস",
+            farmingAdvice: "কৃষি পরামর্শ",
+            humidity: "আর্দ্রতা",
+            windSpeed: "বাতাস",
+            pressure: "চাপ",
+            visibility: "দৃশ্যমানতা",
+            uvIndex: "ইউভি সূচক",
+            today: "আজ",
+            tomorrow: "আগামীকাল",
+            lastUpdated: "সর্বশেষ আপডেট",
+          },
+        },
+        pa: {
+          weather: {
+            title: "ਮੌਸਮ ਡੈਸ਼ਬੋਰਡ",
+            currentWeather: "ਮੌਜੂਦਾ ਮੌਸਮ",
+            forecast: "7-ਦਿਨਾਂ ਦਾ ਪੂਰਵ ਅਨੁਮਾਨ",
+            farmingAdvice: "ਖੇਤੀਬਾੜੀ ਸਲਾਹ",
+            humidity: "ਨਮੀ",
+            windSpeed: "ਹਵਾ",
+            pressure: "ਦਬਾਅ",
+            visibility: "ਦਿੱਖ",
+            uvIndex: "ਯੂਵੀ ਸੂਚਕਾਂਕ",
+            today: "ਅੱਜ",
+            tomorrow: "ਕੱਲ੍ਹ",
+            lastUpdated: "ਆਖਰੀ ਅੱਪਡੇਟ",
+          },
+        },
+      };
+      const soilConditions = {
+        temperature: 20, // Converted 68F to 20C
+        moisture: [
+          { field: "North Field", level: 78, status: "Optimal" },
+          { field: "West Field", level: 65, status: "Good" },
+          { field: "South Field", level: 45, status: "Low" },
+          { field: "East Field", level: 82, status: "High" },
+        ],
+      };
+      let currentLanguage = "en";
+      let lastForecastData = null;
+
+      function getTranslation(language, key) {
+        const keys = key.split(".");
+        let value = translations[language] || translations.en;
+        for (const k of keys) {
+          value = value[k];
+          if (!value) return key;
+        }
+        return value;
+      }
+
+      function applyTranslations(language) {
+        document.querySelectorAll("[data-translate]").forEach((element) => {
+          const key = element.getAttribute("data-translate");
+          const translation = getTranslation(language, key);
+          if (element.id === "lastUpdated") {
+            const time = element.textContent.split(": ")[1] || "";
+            element.textContent = `${translation}: ${time}`;
+          } else {
+            element.textContent = translation;
+          }
+        });
+      }
+
+      function initializeLanguage() {
+        document
+          .getElementById("languageSelect")
+          .addEventListener("change", (e) => {
+            currentLanguage = e.target.value;
+            applyTranslations(currentLanguage);
+            if (lastForecastData) populateForecast(lastForecastData);
+          });
+      }
+
+      // --- OPEN-METEO API IMPLEMENTATION ---
+
+      function getWeatherInfoFromCode(code) {
+        const weatherMap = {
+          0: { description: "Clear sky", icon: "sun" },
+          1: { description: "Mainly clear", icon: "sun" },
+          2: { description: "Partly cloudy", icon: "cloud-sun" },
+          3: { description: "Overcast", icon: "cloudy" },
+          45: { description: "Fog", icon: "cloud-fog" },
+          48: { description: "Depositing rime fog", icon: "cloud-fog" },
+          51: { description: "Light drizzle", icon: "cloud-drizzle" },
+          53: { description: "Drizzle", icon: "cloud-drizzle" },
+          55: { description: "Dense drizzle", icon: "cloud-drizzle" },
+          61: { description: "Slight rain", icon: "cloud-rain" },
+          63: { description: "Rain", icon: "cloud-rain" },
+          65: { description: "Heavy rain", icon: "cloud-rain-wind" },
+          71: { description: "Slight snow", icon: "cloud-snow" },
+          73: { description: "Snow", icon: "cloud-snow" },
+          75: { description: "Heavy snow", icon: "cloud-snow" },
+          80: { description: "Slight rain showers", icon: "cloud-rain" },
+          81: { description: "Rain showers", icon: "cloud-rain" },
+          82: { description: "Violent rain showers", icon: "cloud-rain-wind" },
+          95: { description: "Thunderstorm", icon: "cloud-lightning" },
+        };
+        return weatherMap[code] || { description: "Clear", icon: "sun" };
+      }
+
+      async function getWeatherData(lat, lon) {
+        // --- UPDATED API CALL FOR INDIAN STANDARDS ---
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,pressure_msl,visibility,dew_point_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max,wind_speed_10m_max&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm&timezone=auto`;
+
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error("Weather data not available");
+          const data = await response.json();
+
+          lastForecastData = data;
+          updateCurrentWeather(data);
+          populateForecast(data);
+          generateFarmingAdvice(data.daily);
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+          document.getElementById("condition").textContent =
+            "Could not fetch weather data.";
+        }
+      }
+
+      function updateCurrentWeather(data) {
+        const { current, daily } = data;
+        const weatherInfo = getWeatherInfoFromCode(current.weather_code);
+
+        document.getElementById("temperature").textContent = `${Math.round(
+          current.temperature_2m
+        )}°C`;
+        document.getElementById("condition").textContent =
+          weatherInfo.description;
+        document.getElementById(
+          "feelsLike"
+        ).textContent = `Feels like ${Math.round(
+          current.apparent_temperature
+        )}°C`;
+        document.getElementById(
+          "humidity"
+        ).innerHTML = `<span data-translate="weather.humidity">${getTranslation(
+          currentLanguage,
+          "weather.humidity"
+        )}</span>: ${current.relative_humidity_2m}%`;
+        document.getElementById(
+          "wind"
+        ).innerHTML = `<span data-translate="weather.windSpeed">${getTranslation(
+          currentLanguage,
+          "weather.windSpeed"
+        )}</span>: ${Math.round(current.wind_speed_10m)} km/h`;
+        document.getElementById(
+          "pressure"
+        ).innerHTML = `<span data-translate="weather.pressure">${getTranslation(
+          currentLanguage,
+          "weather.pressure"
+        )}</span>: ${Math.round(current.pressure_msl)} hPa`;
+        document.getElementById(
+          "visibility"
+        ).innerHTML = `<span data-translate="weather.visibility">${getTranslation(
+          currentLanguage,
+          "weather.visibility"
+        )}</span>: ${(current.visibility / 1000).toFixed(1)} km`;
+        document.getElementById(
+          "uvIndex"
+        ).innerHTML = `<span data-translate="weather.uvIndex">${getTranslation(
+          currentLanguage,
+          "weather.uvIndex"
+        )}</span>: ${Math.round(daily.uv_index_max[0])}`;
+        document.getElementById(
+          "dewPoint"
+        ).textContent = `Dew Point: ${Math.round(current.dew_point_2m)}°C`;
+
+        const now = new Date();
+        document.getElementById("lastUpdated").textContent = `${getTranslation(
+          currentLanguage,
+          "weather.lastUpdated"
+        )}: ${now.toLocaleTimeString()}`;
+
+        document
+          .getElementById("currentWeatherIcon")
+          .setAttribute("data-lucide", weatherInfo.icon);
+        lucide.createIcons();
+      }
+
+      function populateForecast(data) {
+        const { daily } = data;
+        const forecastGrid = document.getElementById("forecastGrid");
+        forecastGrid.innerHTML = "";
+
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(daily.time[i] + "T00:00:00");
+          const dayName =
+            i === 0
+              ? getTranslation(currentLanguage, "weather.today")
+              : i === 1
+              ? getTranslation(currentLanguage, "weather.tomorrow")
+              : date.toLocaleDateString(currentLanguage, { weekday: "short" });
+
+          const weatherInfo = getWeatherInfoFromCode(daily.weather_code[i]);
+
+          forecastGrid.insertAdjacentHTML(
+            "beforeend",
+            `
+              <div class="forecast-item">
+                <p class="forecast-day">${dayName}</p>
+                <p class="forecast-date">${date.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })}</p>
+                <i data-lucide="${weatherInfo.icon}" class="forecast-icon"></i>
+                <div class="forecast-temps">
+                  <span class="forecast-high">${Math.round(
+                    daily.temperature_2m_max[i]
+                  )}°C</span>
+                  <span class="forecast-low">${Math.round(
+                    daily.temperature_2m_min[i]
+                  )}°C</span>
+                </div>
+                <p class="forecast-condition">${weatherInfo.description}</p>
+                <div class="forecast-details">
+                  <div class="forecast-detail">
+                    <i data-lucide="droplets" class="icon-sm text-blue-500"></i>
+                    <span>${daily.precipitation_probability_max[i]}%</span>
+                  </div>
+                  <div class="forecast-detail">
+                    <i data-lucide="wind" class="icon-sm text-gray-500"></i>
+                    <span>${Math.round(daily.wind_speed_10m_max[i])} km/h</span>
+                  </div>
+                </div>
+              </div>`
+          );
+        }
+        lucide.createIcons();
+      }
+
+      function generateFarmingAdvice(dailyForecast) {
+        let adviceGenerated = [];
+        const rainyDayIndex =
+          dailyForecast.precipitation_probability_max.findIndex(
+            (prob) => prob > 60
+          );
+        if (rainyDayIndex !== -1) {
+          const rainDate = new Date(
+            dailyForecast.time[rainyDayIndex] + "T00:00:00"
+          ).toLocaleDateString(undefined, { weekday: "long" });
+          adviceGenerated.push({
+            type: "Harvest",
+            message: `High chance of rain on ${rainDate}. Plan to harvest sensitive crops beforehand.`,
+            priority: "High",
+            icon: "alert-triangle",
+          });
+        }
+        const drySpell = dailyForecast.precipitation_probability_max
+          .slice(0, 3)
+          .every((prob) => prob < 20);
+        if (drySpell) {
+          adviceGenerated.push({
+            type: "Irrigation",
+            message:
+              "No significant rain expected soon. Monitor soil moisture.",
+            priority: "Medium",
+            icon: "droplets",
+          });
+        }
+        const idealSprayingIndex = dailyForecast.wind_speed_10m_max.findIndex(
+          (speed) => speed < 10
+        );
+        if (idealSprayingIndex !== -1) {
+          const sprayDate = new Date(
+            dailyForecast.time[idealSprayingIndex] + "T00:00:00"
+          ).toLocaleDateString(undefined, { weekday: "long" });
+          adviceGenerated.push({
+            type: "Spraying",
+            message: `Ideal conditions for spraying on ${sprayDate} (low wind).`,
+            priority: "Low",
+            icon: "wind",
+          });
+        }
+        if (adviceGenerated.length === 0) {
+          adviceGenerated.push({
+            type: "General",
+            message: "Weather conditions appear stable.",
+            priority: "Low",
+            icon: "check-circle",
+          });
+        }
+        populateAlerts(adviceGenerated);
+      }
+
+      function populateAlerts(alerts) {
+        const alertsList = document.getElementById("alertsList");
+        alertsList.innerHTML = "";
+        alerts.forEach((alert) => {
+          alertsList.insertAdjacentHTML(
+            "beforeend",
+            `<div class="alert-item priority-${alert.priority.toLowerCase()}"><div class="alert-content"><i data-lucide="${
+              alert.icon
+            }" class="alert-icon"></i><div class="alert-details"><div class="alert-header"><p class="alert-type">${
+              alert.type
+            }</p><span class="alert-priority badge badge-outline">${
+              alert.priority
+            }</span></div><p class="alert-message">${
+              alert.message
+            }</p></div></div></div>`
+          );
+        });
+        lucide.createIcons();
+      }
+
+      function populateSoilMoisture() {
+        const moistureList = document.getElementById("moistureList");
+        moistureList.innerHTML = "";
+        document.getElementById(
+          "soilTemp"
+        ).textContent = `${soilConditions.temperature}°C`;
+        soilConditions.moisture.forEach((field) => {
+          moistureList.insertAdjacentHTML(
+            "beforeend",
+            `<div class="moisture-item"><span class="moisture-field">${
+              field.field
+            }</span><div class="moisture-data"><span class="moisture-level">${
+              field.level
+            }%</span><span class="moisture-status ${field.status.toLowerCase()} badge badge-outline">${
+              field.status
+            }</span></div></div>`
+          );
+        });
+      }
+
+      // --- INITIALIZATION ---
+      function initializeDashboard() {
+        initializeLanguage();
+        populateSoilMoisture();
+        applyTranslations(currentLanguage);
+
+        const subtitleElement = document.querySelector(".dashboard-subtitle");
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              subtitleElement.textContent =
+                "Current conditions and forecast for your location";
+              getWeatherData(latitude, longitude);
+            },
+            () => {
+              subtitleElement.textContent =
+                "Could not get location. Showing weather for Berhampore.";
+              getWeatherData(24.1, 88.25); // Berhampore, West Bengal
+            }
+          );
+        } else {
+          subtitleElement.textContent =
+            "Geolocation not supported. Showing weather for Berhampore.";
+          getWeatherData(24.1, 88.25); // Berhampore, West Bengal
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", initializeDashboard);
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("Service Worker: Registered"))
+            .catch((err) => console.log(`Service Worker: Error: ${err}`));
+        });
+      }
+    </script>
+  </body>
+</html>
+
+
+
