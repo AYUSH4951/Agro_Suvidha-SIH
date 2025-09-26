@@ -2,7 +2,8 @@
   "name": "Agro Suvidha",
   "short_name": "Agro",
   "description": "Your guide to modern farming solutions.",
-  "start_url": "/index.html",
+  "start_url": "/Agro_Suvidha-SIH/index.html",
+  "scope": "/Agro_Suvidha-SIH/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
@@ -34,4 +35,5 @@
     }
   ]
 }
+
 
